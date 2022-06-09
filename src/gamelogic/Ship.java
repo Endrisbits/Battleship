@@ -1,4 +1,4 @@
-package battleship.gamelogic;
+package gamelogic;
 
 enum shipTypes {
     AIRCRAFT_CARRIER("Aircraft Carrier", 5),

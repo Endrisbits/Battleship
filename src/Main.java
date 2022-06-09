@@ -1,4 +1,3 @@
-package battleship;
 
 import battleship.gamelogic.GameLogic;
 

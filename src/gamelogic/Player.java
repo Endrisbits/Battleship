@@ -1,4 +1,4 @@
-package battleship.gamelogic;
+package gamelogic;
 
 class Player {
     private final int numberOfShips = 5;

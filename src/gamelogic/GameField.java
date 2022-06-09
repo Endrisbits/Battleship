@@ -1,4 +1,4 @@
-package battleship.gamelogic;
+package gamelogic;
 
 class GameField {
     static final char startingRow = 'A';

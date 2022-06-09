@@ -1,4 +1,4 @@
-package battleship.gamelogic;
+package gamelogic;
 
 import java.io.PrintStream;
 import java.util.Scanner;

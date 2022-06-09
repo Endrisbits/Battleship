@@ -1,6 +1,6 @@
-package battleship.gamelogic;
+package gamelogic;
 
-import battleship.gamelogic.Ship;
+import gamelogic.Ship;
 
 enum squareStates {
     O('O'),
