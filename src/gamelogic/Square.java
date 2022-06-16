@@ -1,10 +1,10 @@
 package gamelogic;
 
 enum squareStates {
-    O('O'),
-    X('X'),
-    M('M'),
-    EMPTY('~');
+    O('O'), //Occupied
+    X('X'), //Hit
+    M('M'), //Missed
+    EMPTY('~'); //Fogged or empty
 
     public char label;
 
