@@ -1,7 +1,5 @@
 package gamelogic;
 
-import gamelogic.Ship;
-
 enum squareStates {
     O('O'),
     X('X'),
@@ -28,13 +26,7 @@ class Square {
         this.state = squareStates.EMPTY;
     }
 
-    Square(int row, int col, squareStates s){ //row must represent the difference to GameField.startingRow
-        this.row = row;
-        this.col = col;
-        this.state = s;
-    }
-
-    squareStates getState() {
+    public squareStates getState() {
         return this.state;
     }
 
@@ -60,8 +52,8 @@ class Square {
         this.alreadyHit = true;
     }
 
-    boolean isOccupied () {
-        return this.occupyingShip!=null;
+    public boolean isOccupied () {
+        return (this.occupyingShip != null);
     }
 
 }

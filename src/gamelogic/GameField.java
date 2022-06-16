@@ -57,63 +57,18 @@ class GameField {
         }
     }
 
-    public Ship placeShip(int row1, int col1, int row2, int col2, shipTypes type) throws Exception {
-        if(row1 >= this.rows || row2>= this.rows || col1 >= this.cols || col2 >= this.cols) { //out of bounds check
-            throw new Exception("Error! Wrong ship location! Try again: ");
-        }
-        int length = type.nrOfCells;
-        if(row1==row2) {//Added Horizontally
-            if(col2-col1 != (length-1)) {
-                throw new Exception("Error! Wrong length of the " + type.label + "! Try again:");
-            }  else {//check if the fields are empty
-                for(int j = col1; j <=col2; j++) {
-                    if (this.gameField[row1][j].isOccupied()) {
-                        throw new Exception("Error! You placed it too close to another one. Try again:");
-                    }
-                }
-                Square startSquare = this.gameField[row1][col1];
-                Square endSquare = this.gameField[row1][col2];
-                Ship ship = new Ship(startSquare, endSquare, this, type);
-                for(int j = col1; j <=col2; j++) {
-                    this.gameField[row1][j].occupyWith(ship);
-                }
-                return ship;
-            }
-        }
-        else if(col1==col2) {
-            if (row2 - row1 != (length - 1)) {
-                throw new Exception("Error! Wrong length of the " + type.label + "! Try again:");
-            }
-            else {//check if the fields are empty
-                for (int i = row1; i <=row2; i++) {
-                    if (this.gameField[i][col1].isOccupied()) {
-                        throw new Exception("Error! You placed it too close to another one. Try again:");
-                    }
-                }
-                Square startSquare = this.gameField[row1][col1];
-                Square endSquare = this.gameField[row2][col1];
-                Ship ship = new Ship(startSquare, endSquare, this, type);
-                for(int i = row1; i <=row2; i++) {
-                    this.gameField[i][col1].occupyWith(ship);
-                }
-                return ship;
-            }
-        }
-        else {
-            throw new Exception("Error! Wrong ship location! Try again:");
-        }
+    public Square registerShot(int row, int col){
+        Square refSquare = this.gameField[row][col];
+        refSquare.registerHit();
+        return refSquare;
     }
 
-    public Ship registerShot(int row, int col){
-        Square refSquare = this.gameField[row][col];
-        if(refSquare.isOccupied()) {
-            refSquare.registerHit();
-            return refSquare.getOccupyingShip();
-        }
-        else {
-            refSquare.registerHit();
-            return null;
-        }
+    public boolean hasCell(int row, int col) {
+        return (row < this.rows && row >= 0) && (col < this.cols && col >= 0);
+    }
+
+    public Square getCell(int i, int j) throws IndexOutOfBoundsException{
+        return gameField[i][j];
     }
 }
 

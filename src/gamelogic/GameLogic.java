@@ -2,6 +2,8 @@ package gamelogic;
 
 import java.io.PrintStream;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GameLogic {
     enum gameStates {
@@ -24,6 +26,7 @@ public class GameLogic {
     Player p2;
 
     gameStates currentState;
+    String coordRegex = "[" + GameField.startingRow + "-" +(char) (GameField.startingRow+rows-1) + "][0-9]+";
 
     public GameLogic(PrintStream printstream, Scanner scanner) {
         this.printStream=printstream;
@@ -71,12 +74,12 @@ public class GameLogic {
                 boolean shotFired = false;
                 while (!shotFired) {
                     try {
-                        Ship refShip = this.fireShot(currentPlayer);
-                        if (refShip == null) {
+                        Square hitSquare = this.fireShot(currentPlayer);
+                        if (!hitSquare.isOccupied()) {
                             this.printStream.println("You missed!");
                         } else {
-                            if (refShip.isSunken()) {
-                                if (allShipsSunk(otherPlayer)) {
+                            if (hitSquare.getOccupyingShip().isSunken()) {
+                                if (otherPlayer.allShipsSunk()) {
                                     if (currentState == gameStates.PLAYER1_TURN) {
                                         currentState = gameStates.PLAYER1_WIN;
                                     } else {
@@ -114,7 +117,6 @@ public class GameLogic {
     private gameStates switchTurns(gameStates currentState) {
         printStream.println("Press Enter and pass the move to another player");
         scanner.nextLine();
-        this.clearScreen(this.printStream);
         if(currentState == gameStates.PLAYER1_TURN) {
             return gameStates.PLAYER2_TURN;
         }
@@ -125,73 +127,69 @@ public class GameLogic {
     }
 
     public void positionAllShips(Player player) throws Exception {
-        if (player == p1) this.printStream.println(player.getName() + ", place your ships on the game field");
-        else this.printStream.println(player.getName() + ", place your ships on the game field");
+        this.printStream.println(player.getName() + ", place your ships on the game field");
 
         player.getOwnGameField().printGameField(player);
         for(shipTypes t : shipTypes.values()) {
             boolean placed = false;
             this.printStream.printf("%nEnter the coordinates of the %s (%d cells):%n",t.label, t.nrOfCells);
             while(!placed) {
-                String token1 = scanner.next();
-                String token2 = scanner.next();
-                scanner.nextLine();
-                int row1 = token1.charAt(0)- GameField.startingRow;
-                int col1 = Integer.parseInt(""+token1.substring(1))-1;
+                String input = scanner.nextLine();
+                    if(Pattern.matches(coordRegex + "[\\s]+" + coordRegex, input)) {
+                    Matcher matcher = Pattern.compile(coordRegex).matcher(input);
+                    matcher.find();
+                    String token1 = matcher.group();
+                    matcher.find();
+                    String token2 = matcher.group();
 
-                int row2 = token2.charAt(0)- GameField.startingRow;
-                int col2 = Integer.parseInt(""+token2.substring(1))-1;
+                    int row1 = token1.charAt(0) - GameField.startingRow;
+                    int col1 = Integer.parseInt(""+token1.substring(1))-1;
 
-                if (row1==row2) {
-                    int temp = Math.max(col1, col2);
-                    col1 = Math.min(col1, col2);
-                    col2 = temp;
-                }
-                else if (col1==col2) {
-                    int temp = Math.max(row1, row2);
-                    row1 = Math.min(row1, row2);
-                    row2 = temp;
-                }
-
-                try {
-                    Ship refShip = player.getOwnGameField().placeShip(row1, col1, row2, col2, t);
-                    if(refShip!=null) {
-                        player.addShip(refShip);
-                        placed = true;
+                    int row2 = token2.charAt(0)- GameField.startingRow;
+                    int col2 = Integer.parseInt(""+token2.substring(1))-1;
+                    //Order the coordinates from smallest to largest (row then col)
+                    if (row1==row2) {
+                        int temp = Math.max(col1, col2);
+                        col1 = Math.min(col1, col2);
+                        col2 = temp;
                     }
-                } catch (Exception e) {
-                    this.printStream.println(e.getMessage());
+                    else if (col1==col2) {
+                        int temp = Math.max(row1, row2);
+                        row1 = Math.min(row1, row2);
+                        row2 = temp;
+                    }
+
+                    try {
+                        player.placeShip(row1, col1, row2, col2, t);
+                        placed = true;
+                    } catch (Exception e) {
+                        this.printStream.println(e.getMessage());
+                    }
+                }
+                else {
+                    this.printStream.printf("%nError: Wrong input! Please try again...%n");
                 }
             }
             player.getOwnGameField().printGameField(player);
         }
     }
 
-    public boolean allShipsSunk(Player p) {//player whom ships may be sunk.
-        for(Ship ship : p.ships) {
-            if (!ship.isSunken()) {
-                return false;
+    public Square fireShot(Player player) throws Exception { //player currently firing the shot.
+        String input = scanner.nextLine();
+        if(Pattern.matches(coordRegex, input)) {
+            int row = input.charAt(0)- GameField.startingRow;
+            int col = Integer.parseInt(""+input.substring(1))-1;
+
+            if(row >= player.getOpponentField().getNumberOfRows() || col >= player.getOpponentField().getNumberOfCols()) {
+                throw new Exception("Error! You entered the wrong coordinates! Try again:");
+            }
+            else {
+                return player.getOpponentField().registerShot(row, col);
             }
         }
-        return true;
-    }
-
-    public Ship fireShot(Player player) throws Exception { //player currently firing the shot.
-        String token = scanner.nextLine();
-        int row = token.charAt(0)- GameField.startingRow;
-        int col = Integer.parseInt(""+token.substring(1))-1;
-
-        if(row >= player.getOpponentField().getNumberOfCols() || col >= player.getOpponentField().getNumberOfRows()) {
-            throw new Exception("Error! You entered the wrong coordinates! Try again:");
-        }
         else {
-            return player.getOpponentField().registerShot(row, col);
+            throw new Exception("Wrong Coordinate input!");
         }
-    }
-
-    public void clearScreen(PrintStream printStream) {
-        printStream.print("\033[H\033[2J");
-        printStream.flush();
     }
 
 }

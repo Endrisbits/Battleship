@@ -18,16 +18,10 @@ enum shipTypes {
 public class Ship {
     shipTypes type;
     int health;
-    Square start;
-    Square end;
-    GameField gameField;
 
-    Ship(Square start, Square end, GameField gameField, shipTypes type) {
+    Ship(shipTypes type) {
         this.type = type;
         this.health = type.nrOfCells;
-        this.start = start;
-        this.end = end;
-        this.gameField = gameField;
     }
 
     public boolean isSunken() {

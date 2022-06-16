@@ -1,5 +1,5 @@
 
-import battleship.gamelogic.GameLogic;
+import gamelogic.GameLogic;
 
 import java.util.Scanner;
 
