@@ -6,5 +6,5 @@ Each player has no information about the placement of the ships of the opponent.
 ## The Implementation
 There is a GameLogic class that deals with the game logic, including adding the ships at the start of the game and managing the user inputs and switching the player's turns. It has references to both players and to both GameFields as well as a state to keep track of the turns.
 
-The GameField class is a collection of mostly data objects. Each GameField has a matrix of squares and an owner which is one of the players. Used some exceptions for dealing with incorrect or malformed input cases with a simple message to inform the user.
+The GameField class is a collection of mostly data objects. Each GameField has a matrix of squares and an owner which is one of the players. Some exceptions were used for dealing with incorrect or malformed input cases with a simple message to inform the user.
 
