@@ -114,6 +114,50 @@ public class GameLogic {
         }
     }
 
+    public void placeShip(int row1, int col1, int row2, int col2, shipTypes type, Player player) throws Exception {
+
+        if(!(player.getOwnGameField().hasCell(row1, col1) && player.getOwnGameField().hasCell(row2, col2))) { //out of bounds check
+            throw new Exception("Error! Wrong ship location! Try again: ");
+        }
+        int length = type.nrOfCells;
+        if(row1==row2) {//Added Horizontally
+            if(col2-col1 != (length-1)) {
+                throw new Exception("Error! Wrong length of the " + type.label + "! Try again:");
+            }  else {//check if the fields are empty
+                for(int j = col1; j <=col2; j++) {
+                    if (player.getOwnGameField().getCell(row1,j).isOccupied()) {
+                        throw new Exception("Error! You placed it too close to another one. Try again:");
+                    }
+                }
+                Ship ship = new Ship(type);
+                player.addShip(ship);
+                for(int j = col1; j <=col2; j++) {
+                    player.getOwnGameField().getCell(row1,j).occupyWith(ship);
+                }
+            }
+        }
+        else if(col1==col2) {
+            if (row2 - row1 != (length - 1)) {
+                throw new Exception("Error! Wrong length of the " + type.label + "! Try again:");
+            }
+            else {//check if the fields are empty
+                for (int i = row1; i <=row2; i++) {
+                    if (player.getOwnGameField().getCell(i,col1).isOccupied()) {
+                        throw new Exception("Error! You placed it too close to another one. Try again:");
+                    }
+                }
+                Ship ship = new Ship(type);
+                player.addShip(ship);
+                for(int i = row1; i <=row2; i++) {
+                    player.getOwnGameField().getCell(i,col1).occupyWith(ship);
+                }
+            }
+        }
+        else {
+            throw new Exception("Error! Wrong ship location! Try again:");
+        }
+    }
+
     private gameStates switchTurns(gameStates currentState) {
         printStream.println("Press Enter and pass the move to another player");
         scanner.nextLine();
@@ -135,7 +179,7 @@ public class GameLogic {
             this.printStream.printf("%nEnter the coordinates of the %s (%d cells):%n",t.label, t.nrOfCells);
             while(!placed) {
                 String input = scanner.nextLine();
-                    if(Pattern.matches(coordRegex + "[\\s]+" + coordRegex, input)) {
+                if(Pattern.matches(coordRegex + "[\\s]+" + coordRegex, input)) {
                     Matcher matcher = Pattern.compile(coordRegex).matcher(input);
                     matcher.find();
                     String token1 = matcher.group();
@@ -160,7 +204,7 @@ public class GameLogic {
                     }
 
                     try {
-                        player.placeShip(row1, col1, row2, col2, t);
+                        placeShip(row1, col1, row2, col2, t, player);
                         placed = true;
                     } catch (Exception e) {
                         this.printStream.println(e.getMessage());
